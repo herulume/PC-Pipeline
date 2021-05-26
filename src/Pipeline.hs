@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Pipeline where
+module Pipeline (processFiles) where
 
 import Control.Concurrent.Async (mapConcurrently)
+import Cp
 import Pipeline.Files
 import Pipeline.Props
 import Pipeline.Utils
@@ -31,7 +32,8 @@ unzipAndRun unzipFun logF file = runManaged $ do
 
 processFiles :: FilePath -> FilePath -> IO ()
 processFiles logF dir = do
-  (files, filesStack) <- lsZips dir
-  _ <- mapConcurrently (unzipAndRun unzipFile logF) files
-  _ <- mapConcurrently (unzipAndRun unzipStackFile logF) filesStack
+  let runt = unzipAndRun unzipFile logF
+      runtStack = unzipAndRun unzipStackFile logF
+  files <- fmap (conc . ((map i1) >< (map i2))) . lsZips $ dir
+  _ <- mapConcurrently (either runt runtStack) files
   print ("Done" :: String)
