@@ -1,0 +1,91 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: bc119c977f00b1b617d4a53e548ed97f6ff445270956c8a71f5ff438d4c1f1b5
+
+name:           pipeline
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/pipeline#readme>
+homepage:       https://github.com/githubuser/pipeline#readme
+bug-reports:    https://github.com/githubuser/pipeline/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2021 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/pipeline
+
+library
+  exposed-modules:
+      BTree
+      Cp
+      List
+      LTree
+      Nat
+      Pipeline
+      Pipeline.Files
+      Pipeline.Props
+      Pipeline.Utils
+  other-modules:
+      Paths_pipeline
+  hs-source-dirs:
+      src
+  build-depends:
+      QuickCheck
+    , async
+    , base >=4.7 && <5
+    , foldl
+    , gloss
+    , process
+    , text
+    , turtle
+  default-language: Haskell2010
+
+executable pipeline-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_pipeline
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , async
+    , base >=4.7 && <5
+    , foldl
+    , gloss
+    , pipeline
+    , process
+    , text
+    , turtle
+  default-language: Haskell2010
+
+test-suite pipeline-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_pipeline
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , async
+    , base >=4.7 && <5
+    , foldl
+    , gloss
+    , pipeline
+    , process
+    , text
+    , turtle
+  default-language: Haskell2010
