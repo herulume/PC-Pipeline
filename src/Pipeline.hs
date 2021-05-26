@@ -1,23 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module Pipeline where
 
+import Control.Concurrent.Async (mapConcurrently)
+import Pipeline.Files
 import Pipeline.Props
 import Pipeline.Utils
-import Pipeline.Files
-import Control.Concurrent.Async (mapConcurrently)
 import Turtle
 import Prelude hiding (FilePath)
 
-
 runTests :: Text -> FilePath -> Text -> IO ()
 runTests group logF file = do
-  let log     = (show group) <> "\n"
+  let log = (show group) <> "\n"
       appendT = appendFile (encodeString logF)
   compile <- compilePred file
   if compile
-    then do failedProps  <- failProps file props
-            changedTypes <- failTypes file props
-            appendT $ log <> "Failed props: " <> show failedProps <> "\n" <> "Changed types: " <> show changedTypes <> "\n\n"
+    then do
+      failedProps <- failProps file props
+      changedTypes <- failTypes file props
+      appendT $ log <> "Failed props: " <> show failedProps <> "\n" <> "Changed types: " <> show changedTypes <> "\n\n"
     else appendT $ log <> "Didn't compile\n\n"
 
 unzipAndRun :: (Text -> Text -> IO ()) -> FilePath -> FilePath -> IO ()
