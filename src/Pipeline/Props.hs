@@ -18,7 +18,7 @@ import Prelude hiding (FilePath)
 
 data Prop = Prop
   { name :: !Text,
-    typeSig :: !Text,
+    typeSig :: ![Text],
     qc :: !(Maybe Text)
   }
   deriving (Eq, Show)
@@ -53,7 +53,7 @@ failTypes file = cataList (either epsilon testType)
   where
     epsilon = const (return [])
     testType (p, ioPs) = typeProp file p >>= cond (sameTypeFailed p) (const (((name p) :) <$> ioPs)) (const ioPs)
-    sameTypeFailed p = (/= ((strip . typeSig) p)) . strip
+    sameTypeFailed p = flip notElem ((map strip . typeSig) p) . strip
 
 runProps :: Text -> [Prop] -> IO ()
 runProps file = cataList (either return (uncurry (>>) . ((print <=< runProp file) >< id)))
@@ -61,25 +61,25 @@ runProps file = cataList (either return (uncurry (>>) . ((print <=< runProp file
 props :: [Prop]
 props =
   map (uncurry (uncurry Prop)) $
-    [ (("prop_in_out_idExpAr", "prop_in_out_idExpAr :: Eq a => ExpAr a -> Bool\n"), Nothing),
-      (("prop_out_in_idExpAr", "prop_out_in_idExpAr :: Eq a => OutExpAr a -> Bool\n"), Nothing),
-      (("prop_sum_idr", "prop_sum_idr :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_sum_idl", "prop_sum_idl :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_product_idr", "prop_product_idr :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_product_idl", "prop_product_idl :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_e_id", "prop_e_id :: (Floating a, Real a) => a -> Bool\n"), Nothing),
-      (("prop_negate_id", "prop_negate_id :: (Floating a, Real a) => a -> Bool\n"), Nothing),
-      (("prop_double_negate", "prop_double_negate :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_optimize_respects_semantics", "prop_optimize_respects_semantics\n  :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_const_rule", "prop_const_rule :: (Real a, Floating a) => a -> Bool\n"), Nothing),
-      (("prop_var_rule", "prop_var_rule :: Bool\n"), Nothing),
-      (("prop_sum_rule", "prop_sum_rule :: (Real a, Floating a) => ExpAr a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_product_rule", "prop_product_rule\n  :: (Real a, Floating a) => ExpAr a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_e_rule", "prop_e_rule :: (Real a, Floating a) => ExpAr a -> Bool\n"), Nothing),
-      (("prop_negate_rule", "prop_negate_rule :: (Real a, Floating a) => ExpAr a -> Bool\n"), Nothing),
-      (("prop_congruent", "prop_congruent :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"), Nothing),
-      (("prop_calcLine_def", "prop_calcLine_def :: NPoint -> NPoint -> Float -> Bool\n"), Nothing),
-      (("prop_bezier_sym", "prop_bezier_sym :: [[Rational]] -> Gen Bool\n"), Just "quickCheckWith (stdArgs {maxSize = 10, maxSuccess = 200})"),
-      (("prop_avg", "prop_avg :: Ord a => [a] -> Property\n"), Nothing),
-      (("prop_cat", "prop_cat :: Integer -> Property\n"), Nothing)
+    [ (("prop_in_out_idExpAr", ["prop_in_out_idExpAr :: Eq a => ExpAr a -> Bool\n"]), Nothing),
+      (("prop_out_in_idExpAr", ["prop_out_in_idExpAr :: Eq a => OutExpAr a -> Bool\n"]), Nothing),
+      (("prop_sum_idr", ["prop_sum_idr :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_sum_idl", ["prop_sum_idl :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_product_idr", ["prop_product_idr :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_product_idl", ["prop_product_idl :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_e_id", ["prop_e_id :: (Floating a, Real a) => a -> Bool\n"]), Nothing),
+      (("prop_negate_id", ["prop_negate_id :: (Floating a, Real a) => a -> Bool\n"]), Nothing),
+      (("prop_double_negate", ["prop_double_negate :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_optimize_respects_semantics", ["prop_optimize_respects_semantics\n  :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_const_rule", ["prop_const_rule :: (Real a, Floating a) => a -> Bool\n"]), Nothing),
+      (("prop_var_rule", ["prop_var_rule :: Bool\n"]), Nothing),
+      (("prop_sum_rule", ["prop_sum_rule :: (Real a, Floating a) => ExpAr a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_product_rule", ["prop_product_rule\n  :: (Real a, Floating a) => ExpAr a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_e_rule", ["prop_e_rule :: (Real a, Floating a) => ExpAr a -> Bool\n"]), Nothing),
+      (("prop_negate_rule", ["prop_negate_rule :: (Real a, Floating a) => ExpAr a -> Bool\n"]), Nothing),
+      (("prop_congruent", ["prop_congruent :: (Floating a, Real a) => a -> ExpAr a -> Bool\n"]), Nothing),
+      (("prop_calcLine_def", ["prop_calcLine_def :: NPoint -> NPoint -> Float -> Bool\n"]), Nothing),
+      (("prop_bezier_sym", ["prop_bezier_sym :: [[Rational]] -> Gen Bool\n"]), Just "quickCheckWith (stdArgs {maxSize = 10, maxSuccess = 200})"),
+      (("prop_avg", ["prop_avg :: Ord a => [a] -> Property\n", "prop_avg :: [Double] -> Property"]), Nothing),
+      (("prop_cat", ["prop_cat :: Integer -> Property\n"]), Nothing)
     ]
